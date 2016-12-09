@@ -1,5 +1,8 @@
 "use strict";
 
+var FIREBASE_AUDIENCE = 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit';
+var ALGORITHM = 'RS256';
+var ONE_HOUR_IN_SECONDS = 60 * 60;
 var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -9,7 +12,7 @@ var projects = String(process.env.APP_KEYS).split(',').reduce((r,p) => {
 
     var parts = p.split(':');
 
-    r[parts[0]] = parts[1];
+    r[parts[0]] = parts[1].replace(/\\n/g, '\n');
     return r;
 }, {});
 
