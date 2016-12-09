@@ -12,7 +12,10 @@ var projects = String(process.env.APP_KEYS).split(',').reduce((r,p) => {
 
     var parts = p.split(':');
 
-    r[parts[0]] = parts[1].replace(/\\n/g, '\n');
+    r[parts[0]] = {
+        key: parts[1].replace(/\\n/g, '\n'),
+        email: parts[2]
+    };
     return r;
 }, {});
 
@@ -32,13 +35,15 @@ app.listen(process.env.PORT || 2014, function () {
 
 function generateTokens(uid) {
 
-    return _.mapValues(projects, key => {
+    return _.mapValues(projects, cert => {
         return jwt.sign({
             uid: uid
-        }, key, {
+        }, cert.key, {
             audience: FIREBASE_AUDIENCE,
             expiresIn: ONE_HOUR_IN_SECONDS,
-            algorithm: ALGORITHM
+            algorithm: ALGORITHM,
+            issuer: cert.email,
+            subject: cert.email
         });
     });
 }
