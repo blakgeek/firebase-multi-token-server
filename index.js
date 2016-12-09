@@ -4,7 +4,6 @@ var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
-var FirebaseTokenGenerator = require("firebase-token-generator");
 var app = express();
 var projects = String(process.env.APP_KEYS).split(',').reduce((r,p) => {
 
@@ -30,15 +29,13 @@ app.listen(process.env.PORT || 2014, function () {
 
 function generateTokens(uid) {
 
-    return _.mapValues(projects, token => {
-        let tokenGenerator = new FirebaseTokenGenerator(token);
-        return tokenGenerator.createToken(
-            {
-                uid: uid,
-                // this is just and example of additional data that can be embedded
-                agent: true
-            },
-            {admin: false}
-        );
+    return _.mapValues(projects, key => {
+        return jwt.sign({
+            uid: uid
+        }, key, {
+            audience: FIREBASE_AUDIENCE,
+            expiresIn: ONE_HOUR_IN_SECONDS,
+            algorithm: ALGORITHM
+        });
     });
 }
