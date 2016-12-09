@@ -26,18 +26,19 @@ app.post('/', function (req, resp) {
 
     var token = jwt.decode(req.body);
     console.log(token.user_id);
-    resp.status(200).send(generateTokens(token.user_id));
+    resp.status(200).send(generateTokens(token.user_id, token.email));
 });
 
 app.listen(process.env.PORT || 2014, function () {
     console.log('Example app listening on port 3000!')
 });
 
-function generateTokens(uid) {
+function generateTokens(uid, email) {
 
     return _.mapValues(projects, cert => {
         return jwt.sign({
-            uid: uid
+            uid: uid,
+            email: email
         }, cert.key, {
             audience: FIREBASE_AUDIENCE,
             expiresIn: ONE_HOUR_IN_SECONDS,
